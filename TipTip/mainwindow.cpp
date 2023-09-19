@@ -1,4 +1,4 @@
-#include <QMessageBox>
+﻿#include <QMessageBox>
 #include <QScreen>
 #include <QAction>
 
@@ -53,7 +53,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_pSysTrayMenu, &QMenu::triggered, this , &MainWindow::OnSysMenuToggled);
 
     m_sysTray->setContextMenu(m_pSysTrayMenu);
+    m_sysTray->setToolTip("TipTip");
     m_sysTray->show();
+
+    m_remainingTimer = new QTimer(this);
+    m_remainingTimer->setInterval(1000);
+    connect(m_remainingTimer, &QTimer::timeout, this ,&MainWindow::OnUpdateremainingTime);
 }
 
 MainWindow::~MainWindow()
@@ -64,36 +69,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_okBtn_clicked()
-{
-
-    m_tickTimer->stop();
-    int interval = ui->hBox->value() * 3600 + ui->mBox->value() * 60 + ui->sBox->value();
-    interval = interval * 1000;
-    if(interval <= 0)
-    {
-        QMessageBox::warning(this,"tip", "the interval must be geater than 1s");
-        return;
-    }
-
-    if(ui->onceRadioBtn->isChecked())
-    {
-        QTimer::singleShot(interval, this, &MainWindow::OnTimeOut);
-
-    }
-    else
-    {
-        m_tickTimer->setInterval(interval );
-        m_tickTimer->start();
-
-    }
-    hide();
-    m_sysTray->showMessage("tip"," i'm here", QSystemTrayIcon::NoIcon, 1000);
-
-}
 
 void MainWindow::OnTimeOut()
 {
+
+    if(ui->onceRadioBtn->isChecked())
+    {
+        m_tickTimer->stop();
+    }
     if(ui->cusRadioBtn->isChecked())
     {
         if(m_tipDialog == nullptr)
@@ -112,7 +95,11 @@ void MainWindow::OnTimeOut()
         m_sysTray->showMessage("tip",ui->lineEdit->text());
 
     }
-
+    m_coutTip++;
+    m_remainingTime = 0;
+    m_remainingTimer->stop();
+    m_remainingTimer->start();
+    UpdateCountTip();
 }
 
 void MainWindow::OnMoveTimeOut()
@@ -168,14 +155,63 @@ void MainWindow::closeEvent(QCloseEvent* e)
     if(m_closeType == minuType)
     {
         hide();
-        m_sysTray->showMessage("tip","i'm here", QSystemTrayIcon::NoIcon, 1000);
+        m_sysTray->showMessage("tip",QStringLiteral(" i'm here ↓↓↓"), QSystemTrayIcon::NoIcon, 1000);
         e->ignore();
     }
     else
     {
-
         e->accept();
-
     }
 
+}
+
+void MainWindow::on_okBtn_toggled(bool check)
+{
+    if(check)
+    {
+        m_tickTimer->stop();
+        int interval = ui->hBox->value() * 3600 + ui->mBox->value() * 60 + ui->sBox->value();
+        interval = interval * 1000;
+        if(interval <= 0)
+        {
+            QMessageBox::warning(this,"tip", "the interval must be geater than 1s");
+            return;
+        }
+        m_tickTimer->setInterval(interval );
+        m_tickTimer->start();
+        m_remainingTimer->start();
+
+       // hide();
+       // m_sysTray->showMessage("tip",QStringLiteral(" i'm here ↓↓↓"), QSystemTrayIcon::NoIcon, 1000);
+        ui->okBtn->setText("stop");
+    }
+    else
+    {
+        m_tickTimer->stop();
+        m_remainingTimer->stop();
+        ui->okBtn->setText("start");
+        m_coutTip = 0;
+        m_remainingTime = 0;
+        QString text = QStringLiteral("触发倒计时：--:--:--");
+        ui->remainingLabel->setText(text);
+        UpdateCountTip();
+    }
+}
+
+void MainWindow::OnUpdateremainingTime()
+{
+    int remaining = m_tickTimer->interval() / 1000 - m_remainingTime;
+    int h = remaining / 3600;
+    int m = (remaining - h * 3600)/ 60;
+    int s =( remaining - h * 3600 - m * 60);
+
+    QString text = QStringLiteral("触发倒计时：%0:%1:%2").arg(h , 2, 10 ,QLatin1Char('0')).arg(m , 2, 10,QLatin1Char('0')).arg(s , 2, 10,QLatin1Char('0'));
+    ui->remainingLabel->setText(text);
+    m_remainingTime ++;
+}
+
+void MainWindow::UpdateCountTip()
+{
+    QString text = QStringLiteral("提示次数： %1次").arg(m_coutTip);
+    ui->countLabel->setText(text);
 }

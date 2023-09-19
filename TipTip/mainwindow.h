@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -30,19 +30,28 @@ private:
     int m_moveHeight = 0;
     int m_closeType;
 
+    int m_coutTip = 0;
+    int m_remainingTime = 0;
+
     QPointer<QButtonGroup> m_tipTypeGroup;
     QPointer<QButtonGroup> m_tipTimesGroup;
     QPointer<QTimer> m_tickTimer;
     QPointer<QTimer> m_showTimer;
+    QPointer<QTimer> m_remainingTimer;
     QPointer<QSystemTrayIcon> m_sysTray;
     QPointer<tipDialog> m_tipDialog;
     QPointer<QMenu> m_pSysTrayMenu;
+private:
+    void UpdateCountTip();
+
 private slots:
-    void on_okBtn_clicked();
+    void on_okBtn_toggled(bool);
     void OnTimeOut();
     void OnMoveTimeOut();
     void OnSysMenuToggled(QAction*);
     void OnSysTrayToggled(QSystemTrayIcon::ActivationReason reason);
+    void OnUpdateremainingTime();
+
 protected:
     void closeEvent(QCloseEvent* e) override;
 };
