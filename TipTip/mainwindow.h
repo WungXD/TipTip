@@ -51,6 +51,7 @@ private slots:
     void OnSysMenuToggled(QAction*);
     void OnSysTrayToggled(QSystemTrayIcon::ActivationReason reason);
     void OnUpdateremainingTime();
+    void on_blackScreenCheckBox_toggled(bool);
 
 protected:
     void closeEvent(QCloseEvent* e) override;

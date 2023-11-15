@@ -24,3 +24,5 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     icon.qrc
+
+DISTFILES +=

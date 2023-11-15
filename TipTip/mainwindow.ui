@@ -296,6 +296,19 @@
      <string>触发倒计时：--:--:--</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="blackScreenCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>255</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>防止息屏/休眠</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
