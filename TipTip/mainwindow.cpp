@@ -2,6 +2,9 @@
 #include <QScreen>
 #include <QAction>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -59,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_remainingTimer = new QTimer(this);
     m_remainingTimer->setInterval(1000);
     connect(m_remainingTimer, &QTimer::timeout, this ,&MainWindow::OnUpdateremainingTime);
+
 }
 
 MainWindow::~MainWindow()
@@ -214,4 +218,18 @@ void MainWindow::UpdateCountTip()
 {
     QString text = QStringLiteral("提示次数： %1次").arg(m_coutTip);
     ui->countLabel->setText(text);
+}
+
+void MainWindow::on_blackScreenCheckBox_toggled(bool checked)
+{
+#ifdef Q_OS_WIN
+    if(checked)
+    {
+        SetThreadExecutionState(ES_CONTINUOUS|ES_DISPLAY_REQUIRED|ES_SYSTEM_REQUIRED);
+    }
+    else
+    {
+        SetThreadExecutionState(ES_CONTINUOUS);
+    }
+#endif
 }
